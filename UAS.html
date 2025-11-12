@@ -1,0 +1,845 @@
+<!doctype html>
+<html lang="id">
+<head>
+  <meta charset="utf-8" />
+  <meta name="viewport" content="width=device-width,initial-scale=1" />
+  <title>Web Sederhana Algorithma Kriptografi</title>
+  <style>
+    /* --- Reset & Global --- */
+    :root {
+      --font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, Helvetica, Arial, sans-serif;
+      --bg-color: #f4f7f6;
+      --card-bg: #ffffff;
+      --text-color: #333;
+      --primary-color: #007aff;
+      --primary-text: #ffffff;
+      --secondary-color: #5c5c5c;
+      --border-color: #141a1e;
+      --result-bg: #2d3748;
+      --result-text: #e2e8f0;
+      --radius: 8px;
+      --shadow: 0 4px 12px rgba(0,0,0,0.05);
+    }
+    
+    body {
+      font-family: var(--font-family);
+      margin: 0;
+      background-color: var(--bg-color);
+      color: var(--text-color);
+      line-height: 1.6;
+    }
+    
+    * {
+      box-sizing: border-box;
+    }
+
+    /* =================================
+       GAYA UNTUK HALAMAN HOME (INI YANG DIUBAH)
+    ================================= */
+    
+    .home-wrapper {
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      justify-content: center;
+      min-height: 100vh;
+      padding: 24px;
+      text-align: center;
+
+      /* --- TAMBAHAN BACKGROUND GAMBAR --- */
+      /* Pastikan file 'background_kripto.jpg' ada di folder yang sama */
+      background-image: linear-gradient(rgba(0, 0, 0, 0.6), rgba(0, 0, 0, 0.6)), 
+                        url('background_kripto.jpeg');
+      background-size: cover;
+      background-position: center;
+      background-repeat: no-repeat;
+    }
+
+    .home-container {
+      max-width: 600px;
+      width: 100%;
+      
+      /* --- PERUBAHAN EFEK KACA (GLASSMORPHISM) --- */
+      background: rgba(255, 255, 255, 0.1); /* Latar transparan */
+      border: 1px solid rgba(255, 255, 255, 0.2); /* Border transparan */
+      backdrop-filter: blur(10px); /* Efek blur "kaca" */
+      box-shadow: 0 4px 30px rgba(0, 0, 0, 0.1); /* Bayangan halus */
+      
+      border-radius: var(--radius);
+      padding: 40px;
+    }
+    
+    .home-container h1 {
+      font-size: 32px;
+      font-weight: 700;
+      margin-top: 0;
+      margin-bottom: 16px;
+      color: #ffffff; /* --- DIUBAH JADI PUTIH --- */
+    }
+    
+    .home-container p {
+      font-size: 18px;
+      color: #e0e0e0; /* --- DIUBAH JADI PUTIH PUDAR --- */
+      margin-bottom: 32px;
+    }
+    
+    .button-container {
+      display: flex;
+      flex-direction: column;
+      gap: 16px;
+    }
+    
+    .choice-button {
+      display: block;
+      width: 100%;
+      padding: 20px;
+      font-size: 18px;
+      font-weight: 600;
+      border-radius: var(--radius);
+      border: 0;
+      color: var(--primary-text);
+      background-color: var(--primary-color);
+      cursor: pointer;
+      text-decoration: none;
+      transition: background-color 0.2s, transform 0.1s;
+    }
+    
+    .choice-button:hover {
+      background-color: #0062cc;
+      transform: translateY(-2px);
+    }
+    
+    .choice-button.secondary {
+      background-color: #4CAF50; /* Warna hijau agar beda */
+    }
+    
+    .choice-button.secondary:hover {
+      background-color: #45a049;
+    }
+
+    /* =================================
+       GAYA UNTUK HALAMAN ALGORITMA (ADFGVX & RAIL FENCE)
+       (Ini adalah gaya dari kode Anda sebelumnya)
+    ================================= */
+    
+    .page-wrapper {
+      padding: 24px;
+    }
+    
+    .page-header {
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      max-width: 1200px;
+      margin: 0 auto 16px auto;
+    }
+    
+    .page-header h1 {
+      font-size: 28px;
+      font-weight: 700;
+      margin: 0;
+      color: var(--result-bg);
+    }
+    
+    button.back-button {
+      padding: 10px 16px;
+      font-size: 14px;
+      font-weight: 600;
+      border-radius: 6px;
+      border: 0;
+      color: var(--primary-text);
+      background-color: var(--secondary-color);
+      cursor: pointer;
+      transition: background-color 0.2s;
+    }
+    
+    button.back-button:hover {
+      background-color: #444;
+    }
+    
+    .container {
+      display: grid;
+      grid-template-columns: 1fr; /* Default 1 kolom */
+      gap: 24px;
+      max-width: 1200px;
+      margin: 0 auto;
+    }
+
+    @media (min-width: 960px) {
+      .container {
+        grid-template-columns: 4fr 6fr;
+      }
+    }
+
+    .card {
+      background: var(--card-bg);
+      border-radius: var(--radius);
+      border: 1px solid var(--border-color);
+      box-shadow: var(--shadow);
+      padding: 24px;
+      display: flex;
+      flex-direction: column;
+      gap: 16px;
+    }
+    
+    .card h2 {
+      font-size: 20px;
+      margin-top: 0;
+      margin-bottom: 0;
+    }
+
+    label {
+      display: block;
+      font-size: 14px;
+      font-weight: 600;
+      margin-bottom: 8px;
+      color: #444;
+    }
+
+    textarea,
+    input[type=text],
+    input[type=number] { /* Tambahkan input number */
+      width: 100%;
+      padding: 12px;
+      font-size: 15px;
+      font-family: var(--font-family);
+      border: 1px solid var(--border-color);
+      border-radius: 6px;
+      background-color: #fcfcfc;
+      transition: border-color 0.2s, box-shadow 0.2s;
+    }
+    
+    textarea:focus,
+    input[type=text]:focus,
+    input[type=number]:focus {
+      outline: none;
+      border-color: var(--primary-color);
+      box-shadow: 0 0 0 3px rgba(0,122,255,0.2);
+    }
+
+    textarea {
+      min-height: 120px;
+      resize: vertical;
+    }
+
+    .button-group {
+      display: flex;
+      flex-wrap: wrap;
+      gap: 10px;
+    }
+
+    button {
+      padding: 12px 18px;
+      font-size: 15px;
+      font-weight: 600;
+      border-radius: 6px;
+      border: 0;
+      color: var(--primary-text);
+      background-color: var(--primary-color);
+      cursor: pointer;
+      transition: background-color 0.2s, transform 0.1s;
+    }
+    
+    button:hover {
+      background-color: #0062cc;
+    }
+    
+    button:active {
+      transform: scale(0.98);
+    }
+
+    button.secondary {
+      background-color: var(--secondary-color);
+    }
+    
+    button.secondary:hover {
+      background-color: #444;
+    }
+    
+    .small-note {
+      font-size: 13px;
+      color: #666;
+      margin-top: 8px;
+    }
+
+    pre.result-short {
+      background: var(--result-bg);
+      color: var(--result-text);
+      padding: 16px;
+      border-radius: var(--radius);
+      overflow-x: auto;
+      font-family: "SF Mono", "Menlo", "Consolas", monospace;
+      font-size: 16px;
+      margin: 0;
+      line-height: 1.5;
+      /* --- MODIFIKASI: Ditambahkan agar 'pre' mengisi ruang --- */
+      flex-grow: 1; 
+    }
+
+    .steps-container {
+      flex-grow: 1;
+      display: flex;
+      flex-direction: column;
+      min-height: 200px;
+    }
+
+    .steps-output {
+      flex-grow: 1;
+      white-space: pre-wrap;
+      word-wrap: break-word;
+      font-family: "SF Mono", "Menlo", "Consolas", monospace;
+      font-size: 14px;
+      color: var(--result-bg);
+      background: #fdfdfd;
+      padding: 16px;
+      border-radius: var(--radius);
+      border: 1px solid var(--border-color);
+      overflow: auto;
+      max-height: 640px;
+    }
+
+    /* =================================
+       --- CSS BARU DITAMBAHKAN ---
+    ================================= */
+    .result-wrapper {
+      display: flex;
+      align-items: stretch; /* Membuat tombol dan 'pre' sama tinggi */
+      gap: 8px; /* Jarak antara 'pre' dan tombol */
+    }
+
+    .copy-button {
+      padding: 10px 16px;
+      font-size: 14px;
+      font-weight: 600;
+      border-radius: 6px;
+      border: 0;
+      color: var(--primary-text);
+      background-color: var(--secondary-color);
+      cursor: pointer;
+      transition: background-color 0.2s, transform 0.1s;
+      flex-shrink: 0; /* Mencegah tombol mengecil */
+    }
+    
+    .copy-button:hover {
+      background-color: #444;
+    }
+
+    .copy-button:active {
+       transform: scale(0.98);
+    }
+    /* =================================
+       --- AKHIR CSS BARU ---
+    ================================= */
+
+  </style>
+</head>
+<body>
+
+  <div id="pageHome" class="home-wrapper">
+    <div class="home-container">
+      <h1>Web Sederhana Algorithma Kriptografi</h1>
+      <p>Pilih salah satu algoritma kriptografi klasik di bawah ini untuk memulai enkripsi atau dekripsi.</p>
+      
+      <div class="button-container">
+        <button id="btnGoADFGVX" class="choice-button">ADFGVX Cipher</button>
+        <button id="btnGoRailFence" class="choice-button secondary">Rail Fence Cipher</button>
+      </div>
+    </div>
+  </div>
+
+  <div id="pageADFGVX" style="display:none;" class="page-wrapper">
+    
+    <div class="page-header">
+      <h1>ADFGVX Cipher</h1>
+      <button class="back-button btn-back">Kembali ke Home</button>
+    </div>
+
+    <div class="container">
+      
+      <div class="card">
+        <h2>Kontrol</h2>
+        
+        <div>
+          <label for="inputTextADFGVX">Plaintext / Ciphertext</label>
+          <textarea id="inputTextADFGVX" placeholder="Masukkan teks di sini..."></textarea>
+        </div>
+
+        <div>
+          <label for="polyKey">Polybius Key (6×6)</label>
+          <input type="text" id="polyKey" value="CIP2HER3T4KS5">
+        </div>
+        
+        <div>
+          <label for="transKey">Transposition Key (Columnar)</label>
+          <input type="text" id="transKey" value="KRIPTO">
+        </div>
+
+        <div class="button-group">
+          <button id="btnEncryptADFGVX">Encrypt</button>
+          <button id="btnDecryptADFGVX" class="secondary">Decrypt</button>
+          <button id="btnClearADFGVX" class="secondary">Clear</button>
+        </div>
+        
+        <p class="small-note">
+          Plaintext: A–Z, 0–9. Ciphertext: A,D,F,G,V,X. Semua input bersifat case-insensitive.
+        </p>
+      </div>
+
+      <div class="card">
+        <h2>Hasil</h2>
+        
+        <div>
+          <label>Hasil Singkat</label>
+          <div class="result-wrapper">
+            <pre id="resultADFGVX" class="result-short">-- hasil akan tampil di sini --</pre>
+            <button id="btnCopyADFGVX" class="copy-button" title="Salin ke clipboard">Salin</button>
+          </div>
+        </div>
+        <div class="steps-container">
+          <label>Langkah Proses</label>
+          <pre id="processStepsADFGVX" class="steps-output">-- langkah proses akan tampil di sini --</pre>
+        </div>
+      </div>
+
+    </div>
+  </div>
+
+  <div id="pageRailFence" style="display:none;" class="page-wrapper">
+
+    <div class="page-header">
+      <h1>Rail Fence Cipher</h1>
+      <button class="back-button btn-back">Kembali ke Home</button>
+    </div>
+
+    <div class="container">
+      
+      <div class="card">
+        <h2>Kontrol</h2>
+        
+        <div>
+          <label for="inputTextRF">Plaintext / Ciphertext</label>
+          <textarea id="inputTextRF" placeholder="Masukkan teks di sini..."></textarea>
+        </div>
+
+        <div>
+          <label for="keyRF">Key (Jumlah "Rails" / Pagar)</label>
+          <input type="number" id="keyRF" value="3" min="2">
+        </div>
+
+        <div class="button-group">
+          <button id="btnEncryptRF">Encrypt</button>
+          <button id="btnDecryptRF" class="secondary">Decrypt</button>
+          <button id="btnClearRF" class="secondary">Clear</button>
+        </div>
+        
+        <p class="small-note">
+          Hanya huruf A-Z yang akan diproses. Spasi dan simbol akan diabaikan.
+        </p>
+      </div>
+
+      <div class="card">
+        <h2>Hasil</h2>
+        
+        <div>
+          <label>Hasil Singkat</label>
+          <div class="result-wrapper">
+            <pre id="resultRF" class="result-short">-- hasil akan tampil di sini --</pre>
+            <button id="btnCopyRF" class="copy-button" title="Salin ke clipboard">Salin</button>
+          </div>
+        </div>
+        <div class="steps-container">
+          <label>Langkah Proses</label>
+          <pre id="processStepsRF" class="steps-output">-- langkah proses akan tampil di sini --</pre>
+        </div>
+      </div>
+
+    </div>
+  </div>
+
+
+<script>
+// ==========================================================
+// NAVIGASI HALAMAN
+// ==========================================================
+
+const allPages = document.querySelectorAll('.page-wrapper, .home-wrapper');
+
+function showPage(pageId) {
+  // Sembunyikan semua halaman
+  allPages.forEach(p => {
+    p.style.display = 'none';
+  });
+  
+  // Tampilkan halaman yang diminta
+  const pageToShow = document.getElementById(pageId);
+  if (pageToShow) {
+    // Gunakan 'flex' untuk home, 'block' untuk lainnya
+    pageToShow.style.display = (pageId === 'pageHome') ? 'flex' : 'block';
+  }
+}
+
+// Event listener untuk tombol di Home
+document.getElementById('btnGoADFGVX').addEventListener('click', () => showPage('pageADFGVX'));
+document.getElementById('btnGoRailFence').addEventListener('click', () => showPage('pageRailFence'));
+
+// Event listener untuk semua tombol "Kembali"
+document.querySelectorAll('.btn-back').forEach(btn => {
+  btn.addEventListener('click', () => showPage('pageHome'));
+});
+
+
+// ==========================================================
+// LOGIKA UNTUK ADFGVX
+// ==========================================================
+(function() {
+  const LABELS = ['A','D','F','G','V','X'];
+  const ALPHNUM = 'ABCDEFGHIJKLMNOPQRSTUVWXYZ0123456789';
+
+  const inputText = document.getElementById('inputTextADFGVX');
+  const polyKey = document.getElementById('polyKey');
+  const transKey = document.getElementById('transKey');
+  const resultEl = document.getElementById('resultADFGVX');
+  const stepsEl = document.getElementById('processStepsADFGVX');
+  // --- JAVASCRIPT BARU DITAMBAHKAN ---
+  const btnCopy = document.getElementById('btnCopyADFGVX');
+
+  function sanitizePlain(s) { return (s||'').toUpperCase().split('').filter(ch => ALPHNUM.includes(ch)).join(''); }
+  function sanitizeCipher(s) { return (s||'').toUpperCase().split('').filter(ch => 'ADFGVX'.includes(ch)).join(''); }
+  function uniqueChars(s) { const seen = new Set(); let out=''; for (const ch of (s||'').toUpperCase()){ if (!seen.has(ch) && ALPHNUM.includes(ch)){ seen.add(ch); out+=ch; }} return out; }
+
+  function buildPolybius(key){
+    const uniq = uniqueChars(key||'');
+    const remaining = ALPHNUM.split('').filter(c => !uniq.includes(c)).join('');
+    const full = (uniq + remaining).slice(0,36);
+    const grid = [];
+    for (let r=0;r<6;r++) grid.push(full.slice(r*6, r*6+6).split(''));
+    const pos = {};
+    for (let r=0;r<6;r++) for (let c=0;c<6;c++) pos[grid[r][c]] = [r,c];
+    return {grid,pos,keyString:full};
+  }
+
+  function substituteEncrypt(plain, posMap){
+    let pairs=''; const steps=[];
+    for (const ch of plain){
+      const p = posMap[ch];
+      if (!p) continue;
+      const pair = LABELS[p[0]] + LABELS[p[1]];
+      pairs += pair;
+      steps.push(`${ch} → ${pair}`);
+    }
+    return {pairs,steps};
+  }
+  
+  function substituteDecryptPairs(pairs, polyGrid){
+    const only = (pairs||'').replace(/[^ADFGVX]/g,'');
+    let plain=''; const mapSteps=[];
+    for (let i=0;i<only.length;i+=2){
+      const a=only[i], b=only[i+1];
+      if (!a || !b) break;
+      const r = LABELS.indexOf(a), c = LABELS.indexOf(b);
+      if (r<0||c<0){ mapSteps.push(`${a}${b} → ?`); continue; }
+      const ch = polyGrid[r][c];
+      plain += ch;
+      mapSteps.push(`${a}${b} = ${ch}`);
+    }
+    return {plain,mapSteps};
+  }
+
+  function transpositionEncrypt(pairs, keyStr){
+    const key = (keyStr||'').toUpperCase();
+    const cols = key.length;
+    if (cols === 0) return {cipher:'', steps:['Transposition key kosong.']};
+    const rows = Math.ceil(pairs.length / cols);
+    const table = Array.from({length:rows},()=>Array(cols).fill(''));
+    let idx=0;
+    for (let r=0;r<rows;r++) for (let c=0;c<cols;c++) table[r][c] = pairs[idx++] || '';
+    const order = key.split('').map((ch,i)=>({ch,i})).sort((a,b)=> a.ch < b.ch ? -1 : a.ch > b.ch ? 1 : a.i - b.i);
+    const rankDisplay = order.map((o,s)=>`${o.ch}(${s+1})`).join('   ');
+    let cipher='';
+    for (const o of order){
+      for (let r=0;r<rows;r++) cipher += table[r][o.i] || '';
+    }
+    const steps = [];
+    steps.push('Tabel baris→ (isi per baris):\n' + renderTable(table, key.split('')));
+    steps.push('Urutan kolom (sorted alphabet, per huruf dengan rank):\n' + rankDisplay);
+    steps.push('Baca kolom sesuai urutan di atas (atas→bawah) untuk membentuk ciphertext.');
+    return {cipher,steps};
+  }
+
+  function renderTable(table, header){
+    let s = header ? '   ' + header.join('  ') + '\n' : '';
+    for (let r=0;r<table.length;r++) s += (r+1)+'. ' + table[r].map(x=>x||'·').join('  ') + '\n';
+    return s;
+  }
+
+  function transpositionDecrypt(cipher, keyStr){
+    const key = (keyStr||'').toUpperCase();
+    const cols = key.length;
+    if (cols === 0) return {pairs:'', steps:['Transposition key kosong.']};
+    const total = cipher.length;
+    const rows = Math.ceil(total / cols);
+    const remainder = total % cols;
+    const lengthsPerCol = new Array(cols).fill(rows);
+    if (remainder !== 0) {
+      for (let i=remainder; i<cols; i++) lengthsPerCol[i] = rows - 1;
+    }
+    const order = key.split('').map((ch,i)=>({ch,i})).sort((a,b)=> a.ch < b.ch ? -1 : a.ch > b.ch ? 1 : a.i - b.i);
+    const colsData = new Array(cols).fill('');
+    let pos = 0;
+    for (let s=0;s<order.length;s++){
+      const origIdx = order[s].i;
+      const len = lengthsPerCol[origIdx] || 0;
+      colsData[origIdx] = cipher.slice(pos, pos+len);
+      pos += len;
+    }
+    const table = [];
+    for (let r=0;r<rows;r++){
+      const row = [];
+      for (let c=0;c<cols;c++) row.push((colsData[c] && colsData[c][r]) ? colsData[c][r] : '');
+      table.push(row);
+    }
+    const steps = [];
+    steps.push('Rows: ' + rows + ', Cols: ' + cols + ', Total chars: ' + total);
+    steps.push('Panjang tiap kolom (pos asli 0..): ' + lengthsPerCol.join(', '));
+    steps.push('Kolom terisi (per pos asli):\n' + renderCols(colsData, key.split('')));
+    steps.push('Gabungkan tiap baris kiri→kanan untuk mendapatkan pasangan ADFGVX.');
+    const pairs = table.flat().join('');
+    return {pairs, steps};
+  }
+  
+  function renderCols(colsData, header){
+    let s='';
+    for (let c=0;c<colsData.length;c++) s += `[${header?header[c]:c}]: ${colsData[c]||''}\n`;
+    return s;
+  }
+  
+  function showResult(short, longText){
+    resultEl.textContent = short || '--';
+    stepsEl.textContent = longText || '';
+  }
+
+  document.getElementById('btnEncryptADFGVX').addEventListener('click', ()=>{
+    const plain = sanitizePlain(inputText.value);
+    if (!plain) { showResult('-- Masukkan plaintext valid (A-Z,0-9) --'); return; }
+    if (!transKey.value) { showResult('-- Masukkan transposition key --'); return; }
+    const poly = buildPolybius(polyKey.value);
+    const sub = substituteEncrypt(plain, poly.pos);
+    const trans = transpositionEncrypt(sub.pairs, transKey.value);
+    const top = trans.cipher || '--';
+    const proc = [];
+    proc.push('Polybius key lengkap: ' + poly.keyString);
+    proc.push('');
+    proc.push('Polybius 6×6 grid:');
+    proc.push('     ' + LABELS.join('  '));
+    proc.push('   +--'.repeat(6) + '-+');
+    for (let r=0;r<6;r++) proc.push(LABELS[r] + '  | ' + poly.grid[r].join('  ') + ' |');
+    proc.push('   +--'.repeat(6) + '-+');
+    proc.push('');
+    proc.push('Substitution (char → pair):\n' + sub.steps.join(' | '));
+    proc.push('');
+    proc.push('Pasangan gabungan: ' + sub.pairs);
+    proc.push('');
+    proc.push('Transposition (columnar):\n' + trans.steps.join('\n\n'));
+    showResult(top, proc.join('\n\n'));
+  });
+
+  document.getElementById('btnDecryptADFGVX').addEventListener('click', ()=>{
+    const cipher = sanitizeCipher(inputText.value);
+    if (!cipher) { showResult('-- Masukkan ciphertext valid (A D F G V X) --'); return; }
+    if (!transKey.value) { showResult('-- Masukkan transposition key --'); return; }
+    const poly = buildPolybius(polyKey.value);
+    const transDe = transpositionDecrypt(cipher, transKey.value);
+    if (transDe.pairs.length % 2 !== 0) {
+      const errorSteps = [
+        '--- GAGAL: HASIL DEKRIPSI TRANSPOSISI GANJIL ---',
+        'Pasangan yang dihasilkan: ' + transDe.pairs,
+        '', 'Langkah Dekripsi Transposisi:', ...transDe.steps
+      ];
+      showResult('-- Error: Pasangan Ganjil --', errorSteps.join('\n'));
+      return;
+    }
+    const sub = substituteDecryptPairs(transDe.pairs, poly.grid);
+    const lines = [];
+    lines.push('Dekripsi pasangan (pair → huruf):');
+    lines.push(sub.mapSteps.join('\n'));
+    lines.push('\n=== Plaintext ===');
+    lines.push(sub.plain || '');
+    showResult(sub.plain || '--', lines.join('\n'));
+  });
+
+  document.getElementById('btnClearADFGVX').addEventListener('click', ()=>{
+    inputText.value = '';
+    resultEl.textContent = '-- hasil akan tampil di sini --';
+    stepsEl.textContent = '-- langkah proses akan tampil di sini --';
+  });
+
+  // --- JAVASCRIPT BARU DITAMBAHKAN ---
+  btnCopy.addEventListener('click', () => {
+    const textToCopy = resultEl.textContent;
+    // Jangan salin jika masih placeholder
+    if (textToCopy && !textToCopy.startsWith('--')) {
+      navigator.clipboard.writeText(textToCopy).then(() => {
+        // Beri umpan balik visual
+        const originalText = btnCopy.textContent;
+        btnCopy.textContent = 'Tersalin!';
+        btnCopy.style.background = '#4CAF50'; // Warna hijau
+        setTimeout(() => {
+          btnCopy.textContent = originalText;
+          btnCopy.style.background = ''; // Kembalikan warna
+        }, 1500);
+      }).catch(err => {
+        console.error('Gagal menyalin: ', err);
+      });
+    }
+  });
+})();
+
+
+// ==========================================================
+// LOGIKA UNTUK RAIL FENCE
+// ==========================================================
+(function() {
+  const inputText = document.getElementById('inputTextRF');
+  const keyEl = document.getElementById('keyRF');
+  const resultEl = document.getElementById('resultRF');
+  const stepsEl = document.getElementById('processStepsRF');
+  // --- JAVASCRIPT BARU DITAMBAHKAN ---
+  const btnCopy = document.getElementById('btnCopyRF');
+
+  function sanitize(s) {
+    return (s || '').toUpperCase().replace(/[^A-Z]/g, '');
+  }
+  
+  function showResult(short, longText) {
+    resultEl.textContent = short || '--';
+    stepsEl.textContent = longText || '';
+  }
+  
+  function railFenceEncrypt(text, key) {
+    if (key <= 1) return { result: text, steps: ["Key harus > 1"] };
+    
+    // Buat array untuk rel
+    let fence = Array.from({ length: key }, () => []);
+    let rail = 0;
+    let direction = 1; // 1 = turun, -1 = naik
+
+    // Proses zig-zag
+    for (const char of text) {
+      fence[rail].push(char);
+      
+      if (rail === 0) {
+        direction = 1;
+      } else if (rail === key - 1) {
+        direction = -1;
+      }
+      rail += direction;
+    }
+    
+    // Tampilkan langkah-langkah
+    const steps = [];
+    steps.push(`Membuat ${key} "rails" (pagar):`);
+    for(let i=0; i<key; i++) {
+      steps.push(`Rail ${i+1}: ${fence[i].join('')}`);
+    }
+    steps.push("\nMenggabungkan semua rail:");
+    
+    const result = fence.map(rail => rail.join('')).join('');
+    return { result, steps: steps.join('\n') };
+  }
+  
+  function railFenceDecrypt(cipher, key) {
+    if (key <= 1) return { result: cipher, steps: ["Key harus > 1"] };
+    
+    // 1. Buat pola zig-zag untuk tahu panjang tiap rel
+    let railLengths = new Array(key).fill(0);
+    let rail = 0;
+    let direction = 1;
+    for (let i = 0; i < cipher.length; i++) {
+      railLengths[rail]++;
+      if (rail === 0) direction = 1;
+      else if (rail === key - 1) direction = -1;
+      rail += direction;
+    }
+    
+    // 2. Isi rel dengan ciphertext
+    let fence = [];
+    let pos = 0;
+    const steps = ["Membagi ciphertext ke rail berdasarkan panjangnya:"];
+    for (let r = 0; r < key; r++) {
+      const len = railLengths[r];
+      const railChars = cipher.slice(pos, pos + len);
+      fence.push(railChars.split('')); // simpan sbg array agar mudah di-pop
+      steps.push(`Rail ${r+1} (panjang ${len}): ${railChars}`);
+      pos += len;
+    }
+    
+    // 3. Baca kembali dengan pola zig-zag
+    let result = '';
+    rail = 0;
+    direction = 1;
+    steps.push("\nMembaca kembali dengan pola zig-zag:");
+    for (let i = 0; i < cipher.length; i++) {
+      // Ambil huruf pertama dari rel saat ini
+      const char = fence[rail].shift();
+      result += char;
+      
+      if (rail === 0) direction = 1;
+      else if (rail === key - 1) direction = -1;
+      rail += direction;
+    }
+    
+    return { result, steps: steps.join('\n') };
+  }
+  
+  // Event Listeners untuk Rail Fence
+  document.getElementById('btnEncryptRF').addEventListener('click', () => {
+    const text = sanitize(inputText.value);
+    const key = parseInt(keyEl.value, 10);
+    if (!text) { showResult("-- Masukkan plaintext --"); return; }
+    if (isNaN(key) || key < 2) { showResult("-- Masukkan key (rails) valid (min 2) --"); return; }
+    
+    const { result, steps } = railFenceEncrypt(text, key);
+    showResult(result, "Langkah Enkripsi:\n" + steps);
+  });
+  
+  document.getElementById('btnDecryptRF').addEventListener('click', () => {
+    const cipher = sanitize(inputText.value);
+    const key = parseInt(keyEl.value, 10);
+    if (!cipher) { showResult("-- Masukkan ciphertext --"); return; }
+    if (isNaN(key) || key < 2) { showResult("-- Masukkan key (rails) valid (min 2) --"); return; }
+
+    const { result, steps } = railFenceDecrypt(cipher, key);
+    showResult(result, "Langkah Dekripsi:\n" + steps);
+  });
+  
+  document.getElementById('btnClearRF').addEventListener('click', () => {
+    inputText.value = '';
+    keyEl.value = '3';
+    resultEl.textContent = '-- hasil akan tampil di sini --';
+    stepsEl.textContent = '-- langkah proses akan tampil di sini --';
+  });
+
+  // --- JAVASCRIPT BARU DITAMBAHKAN ---
+  btnCopy.addEventListener('click', () => {
+    const textToCopy = resultEl.textContent;
+    // Jangan salin jika masih placeholder
+    if (textToCopy && !textToCopy.startsWith('--')) {
+      navigator.clipboard.writeText(textToCopy).then(() => {
+        // Beri umpan balik visual
+        const originalText = btnCopy.textContent;
+        btnCopy.textContent = 'Tersalin!';
+        btnCopy.style.background = '#4CAF50'; // Warna hijau
+        setTimeout(() => {
+          btnCopy.textContent = originalText;
+          btnCopy.style.background = ''; // Kembalikan warna
+        }, 1500);
+      }).catch(err => {
+        console.error('Gagal menyalin: ', err);
+      });
+    }
+  });
+
+})();
+</script>
+</body>
+</html>
